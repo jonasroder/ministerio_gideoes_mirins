@@ -1,0 +1,6 @@
+@ministerio_gideoes_mirins_HostAddress = http://localhost:5170
+
+GET {{ministerio_gideoes_mirins_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
