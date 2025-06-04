@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespw
+      POSTGRES_DB: ministerio_db
+    ports:
+      - "5432:5432"
+
+  api:
+    build: .
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespw
+      POSTGRES_DB: ministerio_db
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=ministerio_db;Username=postgres;Password=postgrespw"
+    ports:
+      - "8080:8080"

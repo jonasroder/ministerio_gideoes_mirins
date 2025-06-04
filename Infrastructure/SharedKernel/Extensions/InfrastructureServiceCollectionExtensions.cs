@@ -10,7 +10,7 @@ public static class InfrastructureServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
         services.AddDbContext<ApplicationDbContext>(opt =>
-            opt.UseSqlServer(config.GetConnectionString("DefaultConnection")),
+            opt.UseNpgsql(config.GetConnectionString("DefaultConnection")),
             ServiceLifetime.Scoped);
 
         services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
