@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const getBaseURL = () => {
 	return import.meta.env.DEV
-		   ? 'https://localhost:7044'
+		   ? 'https://localhost:7243'
 		   : window.location.origin
 }
 

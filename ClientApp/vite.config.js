@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     proxy: {
       '^/api': {
-        target: 'https://localhost:7044',
+        target: 'https://localhost:7243',
         changeOrigin: true,
         secure: false,
         // remove o “/api” antes de mandar para o controller

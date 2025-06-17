@@ -6,13 +6,13 @@ FROM node:18 AS client-build
 # 1.1) Define diretório de trabalho no ClientApp
 WORKDIR /app/ClientApp
 
-# 1.2) Copia somente package.json e package-lock.json
+# 1.2) Copia package.json e package-lock.json para instalação otimizada
 COPY ClientApp/package*.json ./
 
-# 1.3) Instala as dependências
+# 1.3) Instala as dependências do front-end
 RUN npm install
 
-# 1.4) Copia o restante e executa build do front-end
+# 1.4) Copia o restante dos arquivos e executa o build
 COPY ClientApp/. ./
 RUN npm run build
 
@@ -23,24 +23,25 @@ RUN npm run build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# 2.1) Copia os .csproj de todos os projetos (camadas)
+# 2.1) Copia os .csproj das camadas para restauração dos pacotes
 COPY ministerio_gideoes_mirins.sln ./
 COPY ministerio_gideoes_mirins/ministerio_gideoes_mirins.csproj ministerio_gideoes_mirins/
 COPY Application/Application.csproj Application/
 COPY Core/Core.csproj Core/
 COPY Infrastructure/Infrastructure.csproj Infrastructure/
 
-# 2.2) Restaura os pacotes
+# 2.2) Restaura os pacotes NuGet
 RUN dotnet restore ministerio_gideoes_mirins.sln
 
-# 2.3) Copia o restante da aplicação
+# 2.3) Copia todo o restante da aplicação
 COPY . .
 
-# 2.4) Copia os arquivos estáticos do front-end para o wwwroot da API
+# 2.4) Copia os arquivos do front-end buildado para o wwwroot da API
 COPY --from=client-build /app/ClientApp/dist ./ministerio_gideoes_mirins/wwwroot/
 
-# 2.5) Publica a aplicação
-RUN dotnet publish ministerio_gideoes_mirins/ministerio_gideoes_mirins.csproj -c Release -o /app/publish
+# 2.5) Publica a aplicação (desabilitando o Target interno do front)
+RUN dotnet publish ministerio_gideoes_mirins/ministerio_gideoes_mirins.csproj -c Release -o /app/publish -p:DisableBuildClientApp=true
+
 
 
 # ===================================================================
@@ -53,15 +54,15 @@ WORKDIR /app
 RUN useradd -m appuser
 USER appuser
 
-# 3.2) Copia o conteúdo publicado
+# 3.2) Copia a aplicação publicada
 COPY --from=build /app/publish .
 
-# 3.3) Exposição da porta da API
+# 3.3) Expõe a porta padrão da API
 EXPOSE 80
 
 # 3.4) Define variáveis de ambiente
 ENV ASPNETCORE_URLS=http://+:80
 ENV ASPNETCORE_ENVIRONMENT=Production
 
-# 3.5) Executa a API
+# 3.5) Executa a aplicação
 ENTRYPOINT ["dotnet", "ministerio_gideoes_mirins.dll"]

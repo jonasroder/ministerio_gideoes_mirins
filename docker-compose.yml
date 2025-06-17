@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   db:
     image: postgres
@@ -19,4 +20,4 @@ services:
       POSTGRES_DB: ministerio_db
       ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=ministerio_db;Username=postgres;Password=postgrespw"
     ports:
-      - "8080:8080"
+      - "8080:80"
